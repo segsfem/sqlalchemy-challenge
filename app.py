@@ -11,7 +11,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///Resources/hawaii.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -19,7 +19,7 @@ Base = automap_base()
 Base.prepare(engine, reflect=True)
 
 # Save reference to the table
-Passenger = Base.classes.passenger
+Measurement = Base.classes.measurement
 
 #################################################
 # Flask Setup
@@ -38,8 +38,8 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
-        f"/api/v1.0<start>/<end>"
+        f"/api/v1.0/start<br/>" 
+        f"/api/v1.0/start/end"
     )
 
 @app.route("/api/v1.0/precipitation")
@@ -55,7 +55,7 @@ def precipitation():
 
     # Create a dictionary from the row data and append precipitation to date
     all_prcp = []
-    for prcp in date:
+    for date, prcp in results:
         prcp_dict = {}
         prcp_dict["date"] = prcp
         all_prcp.append(prcp_dict)
@@ -92,14 +92,14 @@ def temperature():
 
     # Create a dictionary from the row data and append temperature to date
     all_tobs = []
-    for tobs in date:
+    for date, tobs in results:
         temp_dict = {}
         temp_dict["date"] = tobs
         all_tobs.append(temp_dict)
 
     return jsonify(all_tobs)
 
-@app.route("/api/v1.0/start")
+@app.route("/api/v1.0/start") 
 def start():
     # Create our session (link) from Python to the DB
     session = Session(engine)
@@ -123,32 +123,8 @@ def start():
     
     return jsonify(Dates)
 
-@app.route("/api/v1.0/<start>")
-def start():
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
-
-    """Return minumum, maximum and average temperature based on all dates greater than start date"""
-    # Query all passengers
-    results = session.query(Measurement.date, Measurement.tobs).all()
-
-    session.close()
-
-    # Create a dictionary from the row data and append temperatures for dates greater than start date
-    Dates = []
-    for date in Dates:
-        sel = [Measurement.date, 
-            func.min(Measurement.tobs), 
-            func.max(Measurement.tobs), 
-            func.avg(Measurement.tobs)]
-        date_temps = session.query(*sel).\
-        filter(Measurement.date > 'date').all()
-        Dates.append(date_temps)
-    
-    return jsonify(Dates)
-
-@app.route("/api/v1.0/<start>/<end>")
-def start():
+@app.route("/api/v1.0/start/end")
+def end():
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
@@ -161,8 +137,8 @@ def start():
     # Create a dictionary from the row data and append temperatures for dates greater than start date
     start_date = []
     end_date = []
-    query_period = end_date - start_date
-    query_date = query_period[]
+    query_date = end_date - start_date
+    
     for date in query_date:
         sel = [Measurement.date, 
             func.min(Measurement.tobs), 
